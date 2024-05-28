@@ -3,7 +3,7 @@
   tasks:
     - name: Get Hostname
       win_hostname:
-        name: hostname_info
+        name: Admin
 
     - set_fact:
         hostname: "{{ hostname_info.computer_name }}"
