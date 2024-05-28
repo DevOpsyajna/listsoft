@@ -19,7 +19,6 @@
         method: POST
         body_format: json
         body:
-          hostname: "{{ ansible_hostname }}"  # Use Ansible predefined variable for hostname
           mac_address: "{{ mac_address.stdout_lines[0] }}"
           ip_address: "{{ ip_address.stdout_lines[0] }}"
           software_list: "{{ installed_software.stdout_lines }}"
