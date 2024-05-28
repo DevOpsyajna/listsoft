@@ -1,10 +1,4 @@
----
-collections:
-  - name: community.windows
-  - name: ansible.windows
-
-tasks:
-  - name: Get System Information and Installed Software List on Windows
+- name: Get System Information and Installed Software List on Windows
     hosts: windows_hosts
     tasks:
       - name: Get Hostname
