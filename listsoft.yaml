@@ -15,17 +15,18 @@
 
     - name: Push Installed Software List to URL
       uri:
-        url: "http://example.com/api/software"
+        url: "http://example.com/api/software"  # Replace with actual URL
         method: POST
         body_format: json
         body:
-          hostname: "{{ hostname.computer_name }}"
+          hostname: "{{ ansible_hostname }}"  # Use Ansible predefined variable for hostname
           mac_address: "{{ mac_address.stdout_lines[0] }}"
           ip_address: "{{ ip_address.stdout_lines[0] }}"
           software_list: "{{ installed_software.stdout_lines }}"
         status_code: 200
-        validate_certs: no
+        validate_certs: yes  # Consider using valid SSL certificates
       register: response
+      failed_when: response.status != 200  # Handle errors if HTTP response status is not 200
 
     - debug:
         var: response
