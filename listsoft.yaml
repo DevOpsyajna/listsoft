@@ -1,6 +1,12 @@
-name: Get Installed Software List on Windows
+- name: Get list of installed software
   hosts: 172.16.0.67
   tasks:
-    - name: Get Installed Software List
-      win_shell: Get-WmiObject -Class Win32_Product | Select-Object Name
+    - name: Get installed software
+      ansible.windows.win_shell: |
+        Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
+        Select-Object DisplayName, DisplayVersion
       register: installed_software
+
+    - name: Output installed software
+      ansible.builtin.debug:
+        var: installed_software.stdout_lines
