@@ -1,35 +1,38 @@
 - name: Get System Information and Installed Software List on Windows
-    hosts: 172.16.0.67
-    tasks:
-      - name: Get Hostname
-        win_hostname:
-        register: hostname
+  hosts: 172.16.0.67
+  tasks:
+    - name: Get Hostname
+      win_hostname:
+        name: hostname_info
 
-      - name: Get MAC Address
-        win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.MACAddress -ne $null } | Select-Object -First 1 MACAddress
-        register: mac_address
+    - set_fact:
+        hostname: "{{ hostname_info.computer_name }}"
 
-      - name: Get IP Address
-        win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -ne $null } | Select-Object -ExpandProperty IPAddress
-        register: ip_address
+    - name: Get MAC Address
+      win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.MACAddress -ne $null } | Select-Object -First 1 MACAddress
+      register: mac_address
 
-      - name: Get Installed Software List
-        win_shell: Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName
-        register: installed_software
+    - name: Get IP Address
+      win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -ne $null } | Select-Object -ExpandProperty IPAddress
+      register: ip_address
 
-      - name: Push Installed Software List to URL
-        uri:
-          url: "http://example.com/api/software"
-          method: POST
-          body_format: json
-          body:
-            hostname: "{{ hostname.computer_name }}"
-            mac_address: "{{ mac_address.stdout_lines[0] }}"
-            ip_address: "{{ ip_address.stdout_lines[0] }}"
-            software_list: "{{ installed_software.stdout_lines }}"
-          status_code: 200
-          validate_certs: no
-        register: response
+    - name: Get Installed Software List
+      win_shell: Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName
+      register: installed_software
 
-      - debug:
-          var: response
+    - name: Push Installed Software List to URL
+      uri:
+        url: "http://example.com/api/software"
+        method: POST
+        body_format: json
+        body:
+          hostname: "{{ hostname }}"
+          mac_address: "{{ mac_address.stdout_lines[0] }}"
+          ip_address: "{{ ip_address.stdout_lines[0] }}"
+          software_list: "{{ installed_software.stdout_lines }}"
+        status_code: 200
+        validate_certs: no
+      register: response
+
+    - debug:
+        var: response
