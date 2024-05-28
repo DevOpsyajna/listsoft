@@ -1,5 +1,5 @@
 - name: Get list of installed software
-  hosts: windows
+  hosts: 172.16.0.67
   tasks:
     - name: Get installed software
       ansible.windows.win_command: "Get-WmiObject -Class Win32_Product | Select-Object -Property Name, Version"
