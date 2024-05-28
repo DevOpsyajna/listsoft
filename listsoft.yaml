@@ -1,4 +1,4 @@
-- name: Get list of installed software
+- name: Get list of installed software and system information
   hosts: 172.16.0.67
   tasks:
     - name: Get installed software
@@ -7,6 +7,18 @@
         Select-Object DisplayName, DisplayVersion
       register: installed_software
 
-    - name: Output installed software
+    - name: Get MAC Address
+      ansible.windows.win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.MACAddress -ne $null } | Select-Object -First 1 MACAddress
+      register: mac_address
+
+    - name: Get IP Address
+      ansible.windows.win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -ne $null } | Select-Object -ExpandProperty IPAddress
+      register: ip_address
+
+    - name: Output installed software and system information
       ansible.builtin.debug:
-        var: installed_software.stdout_lines
+        msg: |
+          Installed Software:
+          {{ installed_software.stdout_lines }}
+          IP Address: {{ ip_address.stdout }}
+          MAC Address: {{ mac_address.stdout }}
