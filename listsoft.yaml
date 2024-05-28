@@ -1,5 +1,5 @@
 - name: List installed software not running on Windows
-  hosts: windows
+  hosts: 172.16.0.67
   tasks:
     - name: Get installed software
       ansible.windows.win_shell: |
