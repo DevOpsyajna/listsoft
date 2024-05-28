@@ -3,6 +3,7 @@
   tasks:
     - name: Get Hostname
       win_hostname:
+        name: hostname
       register: hostname
 
     - name: Get MAC Address
