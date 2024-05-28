@@ -1,21 +1,20 @@
-- name: Get System Information and Installed Software List on Windows
+---
+- name: Gather Windows system information
   hosts: 172.16.0.67
   tasks:
-    - name: Get MAC Address
-      win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.MACAddress -ne $null } | Select-Object -First 1 MACAddress
-      register: mac_address
-
-    - name: Get IP Address
-      win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -ne $null } | Select-Object -ExpandProperty IPAddress
-      register: ip_address
-
-    - name: Get Installed Software List
-      win_shell: Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName
+    - name: Gather installed software
+      win_package_facts:
+        gather_subset: all
       register: installed_software
 
-    - debug:
-        msg: 
-          - "MAC Address: {{ mac_address.stdout_lines[0] }}"
-          - "IP Address: {{ ip_address.stdout_lines[0] }}"
-          - "Installed Software List:"
-          - "{{ installed_software.stdout_lines }}"
+    - name: Gather running processes
+      win_command: tasklist /FO CSV
+      register: running_processes
+
+    - name: Output installed software in YAML format
+      debug:
+        msg: "{{ installed_software.packages | to_nice_yaml }}"
+
+    - name: Output running processes in YAML format
+      debug:
+        msg: "{{ running_processes.stdout_lines | to_nice_yaml }}"
