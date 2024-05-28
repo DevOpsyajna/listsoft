@@ -1,4 +1,4 @@
-- name: List installed software not running on Windows
+- name: Get list of installed software
   hosts: 172.16.0.67
   tasks:
     - name: Get installed software
@@ -7,9 +7,6 @@
         Select-Object DisplayName, DisplayVersion
       register: installed_software
 
-    - name: Filter installed software not running
-      set_fact:
-        software_not_running: "{{ installed_software.stdout | from_json | selectattr('Name', 'notin', running_processes.stdout) | list }}"
-
-    - debug:
-        var: software_not_running
+    - name: Output installed software
+      ansible.builtin.debug:
+        var: installed_software.stdout_lines
