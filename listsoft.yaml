@@ -1,20 +1,19 @@
 ---
-- name: Gather Windows system information
-  hosts: 172.16.0.67
+- name: Gather software, CPU, and memory info from Windows server
+  hosts: windows_servers
   tasks:
-    - name: Gather installed software
-      win_package_facts:
-        gather_subset: all
+    - name: Get installed software
+      win_command: Get-WmiObject -Class Win32_Product | Select-Object Name, Version
       register: installed_software
 
-    - name: Gather running processes
-      win_command: tasklist /FO CSV
-      register: running_processes
+    - name: Get CPU and memory info
+      win_command: Get-WmiObject -Class Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, Manufacturer; Get-WmiObject -Class Win32_OperatingSystem | Select-Object TotalVisibleMemorySize
+      register: system_info
 
-    - name: Output installed software in YAML format
+    - name: Display results in JSON format
       debug:
-        msg: "{{ installed_software.packages | to_nice_yaml }}"
-
-    - name: Output running processes in YAML format
-      debug:
-        msg: "{{ running_processes.stdout_lines | to_nice_yaml }}"
+        var:
+          software: "{{ installed_software.stdout | from_json }}"
+          system_info: "{{ system_info.stdout | from_json }}"
+      vars:
+        ansible_stdout_encoding: 'utf-8'
