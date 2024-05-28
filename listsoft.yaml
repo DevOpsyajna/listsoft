@@ -1,6 +1,8 @@
-name: Get Installed Software List on Windows
-  hosts: 172.16.0.67
+---
+- name: Get Installed Software List on Windows
+  hosts: windows_hosts
   tasks:
     - name: Get Installed Software List
       win_shell: Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName
       register: installed_software
+
