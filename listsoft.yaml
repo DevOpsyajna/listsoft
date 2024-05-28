@@ -1,5 +1,5 @@
 - name: Get System Information and Installed Software List on Windows
-    hosts: windows_hosts
+    hosts: 172.16.0.67
     tasks:
       - name: Get Hostname
         win_hostname:
