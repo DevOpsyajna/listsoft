@@ -9,9 +9,7 @@
 
     - name: Filter installed software not running
       set_fact:
-        software_not_running: "{{ installed_software.stdout | json_query(query) }}"
-      vars:
-        query: "[? !contains(@, '{{ running_processes.stdout }}[*]')].{Name: Name, Version: Version}"
+        software_not_running: "{{ installed_software.stdout | from_json | selectattr('Name', 'notin', running_processes.stdout) | list }}"
 
     - debug:
         var: software_not_running
