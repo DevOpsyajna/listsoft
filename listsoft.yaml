@@ -1,13 +1,6 @@
 - name: Get System Information and Installed Software List on Windows
   hosts: 172.16.0.67
   tasks:
-    - name: Get Hostname
-      win_hostname:
-        name: Admin
-
-    - set_fact:
-        hostname: "{{ hostname_info.computer_name }}"
-
     - name: Get MAC Address
       win_shell: Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.MACAddress -ne $null } | Select-Object -First 1 MACAddress
       register: mac_address
@@ -26,7 +19,7 @@
         method: POST
         body_format: json
         body:
-          hostname: "{{ hostname }}"
+          hostname: "{{ hostname.computer_name }}"
           mac_address: "{{ mac_address.stdout_lines[0] }}"
           ip_address: "{{ ip_address.stdout_lines[0] }}"
           software_list: "{{ installed_software.stdout_lines }}"
